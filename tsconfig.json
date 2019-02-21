@@ -17,6 +17,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ng-tabz": [
+        "dist/ng-tabz"
+      ],
+      "ng-tabz/*": [
+        "dist/ng-tabz/*"
+      ]
+    }
   }
 }
