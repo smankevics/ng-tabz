@@ -21,9 +21,6 @@
     "paths": {
       "ng-tabz": [
         "dist/ng-tabz"
-      ],
-      "ng-tabz/*": [
-        "dist/ng-tabz/*"
       ]
     }
   }

@@ -4,14 +4,12 @@
     "directive-selector": [
       true,
       "attribute",
-      "tabz",
-      "camelCase"
+      "tabz"
     ],
     "component-selector": [
       true,
       "element",
-      "tabz",
-      "kebab-case"
+      "tabz"
     ]
   }
 }
