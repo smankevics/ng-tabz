@@ -1,6 +1,6 @@
 <div class="tabz-wrapper">
   <ng-template #tabzGroupTmp let-group>
-    <tabz-group [ngClass]="getTabGroupClass(group)" [config]="group">
+    <tabz-group [ngClass]="{'tabz-flex-col': !group.verticalLayout, 'tabz-flex-row': group.verticalLayout }" [config]="group">
       <ng-container *ngIf="!group.children || !group.children.length">
         <ng-container *ngTemplateOutlet="groupTemplate; context: { $implicit: group }"></ng-container>
       </ng-container>
@@ -8,8 +8,6 @@
       <ng-container *ngFor="let child of group.children">
         <ng-container *ngTemplateOutlet="tabzGroupTmp; context: { $implicit: child }"></ng-container>
       </ng-container>
-      <div class="resize-handle-right"></div>
-      <div class="resize-handle-bottom"></div>
     </tabz-group>
   </ng-template>
 

@@ -4,4 +4,9 @@ export interface ITabzGroup {
   height: number;
   width: number;
   children?: ITabzGroup[];
+
+  parent?: ITabzGroup;
+  next?: ITabzGroup;
+  verticalLayout?: boolean;
+  last?: boolean;
 }

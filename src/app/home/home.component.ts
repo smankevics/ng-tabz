@@ -13,7 +13,13 @@ export class HomeComponent {
         { id: 2, name: '1.1', height: 40, width: 100 },
         { id: 3, name: '1.2', height: 60, width: 100, children: [
           { id: 4, name: '1.2.1', height: 100, width: 30 },
-          { id: 5, name: '1.2.2', height: 100, width: 70 }
+          { id: 5, name: '1.2.2', height: 100, width: 70, children: [
+            { id: 2, name: '1.2.2.1', height: 40, width: 100 },
+            { id: 3, name: '1.2.2.2', height: 60, width: 100, children: [
+              { id: 4, name: '1.2.2.2.1', height: 100, width: 30 },
+              { id: 5, name: '1.2.2.2.2', height: 100, width: 70 }
+            ]}
+          ] }
         ]}
       ]},
       { id: 6, name: '2', height: 100, width: 40, children: [
