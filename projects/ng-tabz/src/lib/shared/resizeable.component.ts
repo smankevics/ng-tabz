@@ -9,7 +9,7 @@ import { ITabzGroup } from '../models/tabz-group.interface';
   template: ''
 })
 export class ResizeableComponent implements OnDestroy, AfterContentInit {
-  readonly MIN_SIZE: number = 30;
+  readonly MIN_SIZE: number = 50;
   readonly RESIZE_HEIGHT: string = 'resizeHeight';
   readonly RESIZE_WIDTH: string = 'resizeWidth';
 
@@ -42,6 +42,12 @@ export class ResizeableComponent implements OnDestroy, AfterContentInit {
   ngOnDestroy() {
     this.el.nativeElement.removeEventListener(this.RESIZE_HEIGHT, this.resizeHeightEventHandler);
     this.el.nativeElement.removeEventListener(this.RESIZE_WIDTH, this.resizeWidthEventHandler);
+
+    // resize parent
+    const el = this.prevElement(this.el.nativeElement) || this.nextElement(this.el.nativeElement);
+    if (el) {
+      setTimeout(() => el.dispatchEvent(this.config.verticalLayout ? this.resizeHeightEvent : this.resizeWidthEvent));
+    }
   }
 
   ngAfterContentInit() {
@@ -56,7 +62,6 @@ export class ResizeableComponent implements OnDestroy, AfterContentInit {
           bottom: '.resize-handle-bottom',
           top: false
         },
-        inertia: true,
         onmove: (event: any) => {
           if (event.edges.bottom) {
             this.resizeHeight(event.target, this.nextElement(event.target), event.rect);
@@ -65,6 +70,11 @@ export class ResizeableComponent implements OnDestroy, AfterContentInit {
           }
         }
       } as any);
+  }
+
+  private prevElement = (current: HTMLElement): HTMLElement => {
+    const sameTagChildren = Array.prototype.slice.call(current.parentElement.children).filter(el => el.tagName === current.tagName);
+    return sameTagChildren[sameTagChildren.indexOf(current) - 1] || null;
   }
 
   private nextElement = (current: HTMLElement): HTMLElement => {
@@ -86,7 +96,7 @@ export class ResizeableComponent implements OnDestroy, AfterContentInit {
     if (group.verticalLayout !== originalLayout) {
       return group.children.reduce((acc, item) => acc + (item.children ? this.calculateSameLayoutChildren(item, originalLayout) : 1), 0);
     } else {
-      return Math.max.apply(null, group.children.map(item => {
+      return Math.max(...group.children.map(item => {
         if (item.children) {
           return this.calculateSameLayoutChildren(item, originalLayout);
         } else {

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { ITabz } from 'projects/ng-tabz/src/public_api';
+import { ITabz, ITabzGroup } from 'projects/ng-tabz/src/public_api';
+import { ConcatSource } from 'webpack-sources';
 
 @Component({
   selector: 'app-home-page',
@@ -33,4 +34,22 @@ export class HomeComponent {
       ] }
     ]
   };
+
+  // private removeChildrenByName = (source: ITabzGroup, name: string): ITabzGroup => {
+  //   return {
+  //     ...source,
+  //     children: source.children && source.children
+  //       .map(c => this.removeChildrenByName(c, name))
+  //       .filter(c => c.name !== name)
+  //   };
+  // }
+
+  // remove = (name: string): void => {
+  //   this.tabzSettings = {
+  //     ...this.tabzSettings,
+  //     groups: this.tabzSettings.groups
+  //       .map(g => this.removeChildrenByName(g, name))
+  //       .filter(c => c.name !== name)
+  //   };
+  // }
 }

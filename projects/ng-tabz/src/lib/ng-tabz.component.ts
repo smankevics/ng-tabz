@@ -31,4 +31,34 @@ export class NgTabzComponent implements AfterContentInit {
     this.groupTemplate = this.templates.first.template;
   }
 
+  private removeChildrenByName = (source: ITabzGroup, parent: ITabzGroup, name: string): boolean => {
+    if (!source.children) {
+      return false;
+    }
+    let empty = false;
+    source.children.forEach((c, i) => {
+      empty = this.removeChildrenByName(c, source, name);
+      if (c.name === name || empty) {
+        source.children.splice(i, 1);
+      }
+    });
+    if (source.children.length === 1 && source.children[0].children && parent) {
+      source.children[0].children.forEach(c => parent.children.push(c));
+      return true;
+    }
+    if (!source.children.length) {
+      return true;
+    }
+  }
+
+  remove = (source: ITabzGroup): void => {
+    let empty = false;
+    this._settings.groups.forEach((g, i) => {
+      empty = this.removeChildrenByName(g, null, source.name);
+      if (g.name === source.name || empty) {
+        this._settings.groups.splice(i, 1);
+      }
+    });
+  }
+
 }

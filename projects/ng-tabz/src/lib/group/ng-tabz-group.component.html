@@ -1,3 +1,4 @@
-<ng-content></ng-content>
+<div class="header" (click)="closeButtonClick()" *ngIf="isFinalComponent">{{config.name}}</div>
+<ng-content class="purple-border"></ng-content>
 <div class="resize-handle-right" *ngIf="showRightResizeHandle"></div>
 <div class="resize-handle-bottom" *ngIf="showBottomResizeHandle"></div>
