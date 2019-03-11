@@ -1,18 +1,1 @@
-<div class="tabz-wrapper">
-  <ng-template #tabzGroupTmp let-group>
-    <tabz-group [config]="group" (close)="remove(group)" 
-      [ngClass]="{'tabz-flex-col': !group.verticalLayout, 'tabz-flex-row': group.verticalLayout }">
-      <ng-container *ngIf="!group.children || !group.children.length">
-        <ng-container *ngTemplateOutlet="groupTemplate; context: { $implicit: group }"></ng-container>
-      </ng-container>
-      
-      <ng-container *ngFor="let child of group.children">
-        <ng-container *ngTemplateOutlet="tabzGroupTmp; context: { $implicit: child }"></ng-container>
-      </ng-container>
-    </tabz-group>
-  </ng-template>
-
-  <ng-container *ngFor="let group of settings.groups">
-    <ng-container *ngTemplateOutlet="tabzGroupTmp; context: { $implicit: group }"></ng-container>
-  </ng-container>
-</div>
+<ng-content></ng-content>

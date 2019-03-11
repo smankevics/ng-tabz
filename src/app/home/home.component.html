@@ -1,5 +1,5 @@
-<tabz [settings]="tabzSettings">
-  <ng-template tabzGroupTemplate let-group>
-
-  </ng-template>
+<tabz [settings]="settings">
+  <tabz-group [item]="group" *ngFor="let group of groups">
+    <!-- {{group.name}} -->
+  </tabz-group>
 </tabz>

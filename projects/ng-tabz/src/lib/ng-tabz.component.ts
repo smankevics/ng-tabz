@@ -1,64 +1,102 @@
-import { Component, Input, ChangeDetectionStrategy, ContentChildren, QueryList, AfterContentInit, TemplateRef } from '@angular/core';
-import { ITabz } from './models/tabz.interface';
-import { TabzGroupTemplateDirective } from './models/template.directive';
-import { ITabzGroup } from './models/tabz-group.interface';
-import { SettingsUtils } from './shared/settings-utils.service';
+import {
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+  ElementRef,
+  Renderer2,
+  OnInit,
+  ComponentFactoryResolver,
+  ViewContainerRef,
+  AfterViewInit
+} from '@angular/core';
+import { ITabz, ITabzComponent } from './models/tabz.model';
+import { ITabzGroupComponent } from './models/tabz-group.model';
+import { TabzRenderer } from './shared/tabz-renderer.service';
+import { ResizeHandleComponent } from './resizeHandle/resize-handle.component';
+import { IResizeHandle, IResizeHandleComponent } from './models/resize-handle.model';
+import { IBounds } from './models/bounds.model';
+import { HandleHelper } from './shared/handle.helper';
 
 @Component({
   selector: 'tabz',
   templateUrl: './ng-tabz.component.html',
   styleUrls: ['./ng-tabz.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [SettingsUtils]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgTabzComponent implements AfterContentInit {
-  @ContentChildren(TabzGroupTemplateDirective) templates: QueryList<TabzGroupTemplateDirective>;
-  private _settings: ITabz;
+export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
+  @Input() settings: ITabz;
+  el: HTMLElement;
+  bounds: IBounds;
+  tabzRenderer: TabzRenderer;
+  items: ITabzGroupComponent[];
+  handles: ResizeHandleComponent[];
 
-  @Input()
-  set settings(value: ITabz) {
-    this._settings = this.settingsUtils.load(value);
+  constructor(
+    el: ElementRef<HTMLElement>,
+    private viewContainerRef: ViewContainerRef,
+    public renderer: Renderer2,
+    private factoryResolver: ComponentFactoryResolver
+  ) {
+    this.el = el.nativeElement;
+    this.tabzRenderer = new TabzRenderer(this);
+    this.items = [];
+    this.handles = [];
   }
-  get settings(): ITabz {
-    return this._settings;
+
+  ngOnInit() {
+    this.bounds = { left: 0, top: 0, height: this.el.clientHeight, width: this.el.clientWidth };
+    this.renderer.listen('window', 'resize', this.onWindowResize.bind(this));
   }
 
-  public groupTemplate: TemplateRef<any>;
-
-  constructor(public settingsUtils: SettingsUtils) { }
-
-  ngAfterContentInit() {
-    this.groupTemplate = this.templates.first.template;
+  ngAfterViewInit() {
+    this.addGroupResizeHandles();
+    setTimeout(() => console.table(
+      this.handles.map(item => ({left: item.left, top: item.top, height: item.height, width: item.width})))
+    );
   }
 
-  private removeChildrenByName = (source: ITabzGroup, parent: ITabzGroup, name: string): boolean => {
-    if (!source.children) {
-      return false;
+  private onWindowResize() {
+    this.bounds = { left: 0, top: 0, height: this.el.clientHeight, width: this.el.clientWidth };
+    this.items.forEach(item => this.tabzRenderer.updateItem(item));
+  }
+
+  public onItemResize(handle: IResizeHandleComponent, bounds: IBounds) {
+    console.log(bounds);
+    HandleHelper.checkAndResizeHandles(this.handles, handle, bounds, this.bounds)
+      .forEach(item => this.tabzRenderer.updateHandle(item));
+  }
+
+  public addItem = (item: ITabzGroupComponent): void => {
+    this.items.push(item);
+  }
+
+  private addGroupResizeHandles = (groupId = '', vertical = true): void => {
+    const childrenIds = HandleHelper.nextLevelChildren(this.items.map(item => item.item.id), groupId);
+    if (!childrenIds.length) {
+      return;
     }
-    let empty = false;
-    source.children.forEach((c, i) => {
-      empty = this.removeChildrenByName(c, source, name);
-      if (c.name === name || empty) {
-        source.children.splice(i, 1);
-      }
-    });
-    if (source.children.length === 1 && source.children[0].children && parent) {
-      source.children[0].children.forEach(c => parent.children.push(c));
-      return true;
-    }
-    if (!source.children.length) {
-      return true;
-    }
+
+    // skip drawing resize handle for the last child
+    [...childrenIds].splice(0, childrenIds.length - 1)
+      .forEach(id => {
+        const groupItems: IBounds[] = this.items
+          .filter(item => item.item.id.startsWith(id))
+          .map(item => ({ top: item.top, left: item.left, height: item.height, width: item.width }));
+        const handle = HandleHelper.createResizeHandle(groupItems, vertical, this.settings);
+        this.handles.push(this.createResizeHandle(handle));
+      });
+
+    // add same level children resize handles
+    childrenIds.forEach(id => this.addGroupResizeHandles(id, !vertical));
   }
 
-  remove = (source: ITabzGroup): void => {
-    let empty = false;
-    this._settings.groups.forEach((g, i) => {
-      empty = this.removeChildrenByName(g, null, source.name);
-      if (g.name === source.name || empty) {
-        this._settings.groups.splice(i, 1);
-      }
-    });
+  private createResizeHandle = (handle: IResizeHandle): ResizeHandleComponent => {
+    const factory = this.factoryResolver.resolveComponentFactory(ResizeHandleComponent);
+    const component = factory.create(this.viewContainerRef.injector);
+    component.instance.tabz = this;
+    component.instance.handle = handle;
+    this.viewContainerRef.insert(component.hostView);
+    return component.instance;
   }
 
 }
