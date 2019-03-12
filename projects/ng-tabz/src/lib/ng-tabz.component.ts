@@ -15,7 +15,7 @@ import { TabzRenderer } from './shared/tabz-renderer.service';
 import { ResizeHandleComponent } from './resizeHandle/resize-handle.component';
 import { IResizeHandle, IResizeHandleComponent } from './models/resize-handle.model';
 import { IBounds } from './models/bounds.model';
-import { HandleHelper } from './shared/handle.helper';
+import { ResizeHandleService } from './shared/resize-handle.service';
 
 @Component({
   selector: 'tabz',
@@ -31,6 +31,8 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
   items: ITabzGroupComponent[];
   handles: ResizeHandleComponent[];
 
+  private resizeHandleService: ResizeHandleService;
+
   constructor(
     el: ElementRef<HTMLElement>,
     private viewContainerRef: ViewContainerRef,
@@ -39,6 +41,7 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
   ) {
     this.el = el.nativeElement;
     this.tabzRenderer = new TabzRenderer(this);
+    this.resizeHandleService = new ResizeHandleService(this);
     this.items = [];
     this.handles = [];
   }
@@ -64,7 +67,7 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
 
   public onItemResize(handle: IResizeHandleComponent, bounds: IBounds) {
     console.log(bounds);
-    HandleHelper.checkAndResizeHandles(this.handles, handle, bounds, this.bounds)
+    this.resizeHandleService.checkAndResizeHandles(this.handles, handle, bounds, this.bounds)
       .forEach(item => this.tabzRenderer.updateHandle(item));
   }
 
@@ -73,7 +76,7 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
   }
 
   private addGroupResizeHandles = (groupId = '', vertical = true): void => {
-    const childrenIds = HandleHelper.nextLevelChildren(this.items.map(item => item.item.id), groupId);
+    const childrenIds = this.resizeHandleService.nextLevelChildren(this.items.map(item => item.item.id), groupId);
     if (!childrenIds.length) {
       return;
     }
@@ -84,7 +87,7 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
         const groupItems: IBounds[] = this.items
           .filter(item => item.item.id.startsWith(id))
           .map(item => ({ top: item.top, left: item.left, height: item.height, width: item.width }));
-        const handle = HandleHelper.createResizeHandle(groupItems, vertical, this.settings);
+        const handle = this.resizeHandleService.createResizeHandle(groupItems, vertical);
         this.handles.push(this.createResizeHandle(handle));
       });
 
