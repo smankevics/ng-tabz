@@ -12,10 +12,15 @@ export class HomeComponent {
   };
 
   public groups: ITabzGroup[] = [
-    { id: '1.1.1', name: '1.1.1', left: 0, top: 0, height: 40, width: 10 },
-    { id: '1.1.2', name: '1.1.2', left: 10, top: 0, height: 40, width: 30 },
-    { id: '1.1.3', name: '1.1.3', left: 40, top: 0, height: 40, width: 20 },
-    { id: '1.2', name: '1.2', left: 0, top: 40, height: 60, width: 60 },
-    { id: '2', name: '2', left: 60, top: 0, height: 100, width: 40 }
+    { id: '1.1.1.1', name: '1.1.1.1', left: 0, top: 0, height: 25, width: 25 },
+    { id: '1.1.1.2', name: '1.1.1.2', left: 0, top: 25, height: 25, width: 25 },
+    { id: '1.1.2', name: '1.1.2', left: 25, top: 0, height: 50, width: 15 },
+    { id: '1.2.1', name: '1.2.1', left: 0, top: 50, height: 50, width: 15 },
+    { id: '1.2.2.1', name: '1.2.2.1', left: 15, top: 50, height: 25, width: 25 },
+    { id: '1.2.2.2', name: '1.2.2.2', left: 15, top: 75, height: 25, width: 25 },
+    { id: '2', name: '2', left: 40, top: 0, height: 100, width: 30 },
+    { id: '3.1', name: '3.1', left: 70, top: 0, height: 33.333, width: 30 },
+    { id: '3.2', name: '3.2', left: 70, top: 33.333, height: 33.333, width: 30 },
+    { id: '3.3', name: '3.3', left: 70, top: 66.666, height: 33.333, width: 30 }
   ];
 }

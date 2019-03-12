@@ -1,9 +1,24 @@
 import { IBounds } from '../models/bounds.model';
 import { IResizeHandle, IResizeHandleComponent } from '../models/resize-handle.model';
 import { ITabz } from '../models/tabz.model';
+import { IPositionable } from '../models/positionable.model';
 
 export class HandleHelper {
-  public static readonly MIN_SIZE = 30;
+  private static readonly MIN_SIZE = 30;
+
+  private static checkCollision = (a: IPositionable, b: IPositionable, vertical: boolean): boolean => {
+    const ignored = HandleHelper.MIN_SIZE / 2,
+      ignoredX = vertical ? 0 : ignored,
+      ignoredY = vertical ? ignored : 0;
+    if (a.left <= b.left + b.width - ignoredX &&
+      a.left + a.width - ignoredX >= b.left &&
+      a.top <= b.top + b.height - ignoredY &&
+      a.top + a.height - ignoredY >= b.top) {
+        return true;
+   } else {
+     return false;
+   }
+  }
 
   public static nextLevelChildren = (ids: string[], groupId: string): string[] => {
     return ids
@@ -37,7 +52,7 @@ export class HandleHelper {
       vertical: true,
       top: first.top,
       left: last.left + last.width,
-      height: last.top + last.height,
+      height: last.top + last.height - first.top,
       width: 2 + margin
     } : {
       id: null,
@@ -45,7 +60,7 @@ export class HandleHelper {
       top: last.top + last.height,
       left: first.left,
       height: 2 + margin,
-      width: last.left + last.width
+      width: last.left + last.width - first.left
     };
   }
 
@@ -58,10 +73,13 @@ export class HandleHelper {
     if (!initiator) {
       return [];
     }
+    const ignored = HandleHelper.MIN_SIZE / 2;
 
     if (initiator.handle.vertical) {
       const boundaryHandles: IResizeHandleComponent[] = handles
-        .filter(item => item.handle.vertical === initiator.handle.vertical && item !== initiator)
+        .filter(item => item !== initiator && item.handle.vertical === initiator.handle.vertical &&
+          item.top < initiator.top + initiator.height - ignored && item.height + item.top - ignored > initiator.top
+        )
         .reduce((result, item) => ([
           (item.left > (result[0] ? result[0].left : 0) && item.left < initiator.left) ? item : result[0],
           (item.left < (result[1] ? result[1].left : Infinity) && item.left > initiator.left) ? item : result[1]
@@ -80,12 +98,16 @@ export class HandleHelper {
 
       const affectedHandles = handles
         .filter(item => item.handle.vertical !== initiator.handle.vertical)
-        .filter(item => {
-          if (item.left + item.width === initiator.left) {
-            item.width += (left - initiator.left);
-            return true;
-          }
-          return false;
+        .filter(item => HandleHelper.checkCollision(initiator, item, initiator.handle.vertical));
+
+      const dx = initiator.left - left;
+      affectedHandles.forEach(item => {
+        if (item.left < initiator.left) {
+          item.width -= dx;
+        } else {
+          item.left -= dx;
+          item.width += dx;
+        }
       });
 
       initiator.left = left;
@@ -95,7 +117,9 @@ export class HandleHelper {
       ];
     } else {
       const boundaryHandles: IResizeHandleComponent[] = handles
-        .filter(item => item.handle.vertical === initiator.handle.vertical && item !== initiator)
+        .filter(item => item !== initiator && item.handle.vertical === initiator.handle.vertical &&
+          item.left < initiator.left + initiator.width - ignored && item.left + item.width - ignored > initiator.left
+        )
         .reduce((result, item) => ([
           (item.top > (result[0] ? result[0].top : 0) && item.top < initiator.top) ? item : result[0],
           (item.top < (result[1] ? result[1].top : Infinity) && item.top > initiator.top) ? item : result[1]
@@ -114,12 +138,16 @@ export class HandleHelper {
 
       const affectedHandles = handles
         .filter(item => item.handle.vertical !== initiator.handle.vertical)
-        .filter(item => {
-          if (item.top + item.height === initiator.top) {
-            item.height += (top - initiator.top);
-            return true;
-          }
-          return false;
+        .filter(item => HandleHelper.checkCollision(initiator, item, initiator.handle.vertical));
+
+      const dy = initiator.top - top;
+      affectedHandles.forEach(item => {
+        if (item.top < initiator.top) {
+          item.height -= dy;
+        } else {
+          item.top -= dy;
+          item.height += dy;
+        }
       });
 
       initiator.top = top;

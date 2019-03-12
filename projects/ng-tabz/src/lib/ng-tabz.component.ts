@@ -45,14 +45,16 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
 
   ngOnInit() {
     this.bounds = { left: 0, top: 0, height: this.el.clientHeight, width: this.el.clientWidth };
+    console.log(this.bounds);
     this.renderer.listen('window', 'resize', this.onWindowResize.bind(this));
   }
 
   ngAfterViewInit() {
     this.addGroupResizeHandles();
-    setTimeout(() => console.table(
-      this.handles.map(item => ({left: item.left, top: item.top, height: item.height, width: item.width})))
-    );
+
+    setTimeout(() => {
+      console.table(this.handles.map(item => ({left: item.left, top: item.top, height: item.height, width: item.width})));
+    });
   }
 
   private onWindowResize() {
@@ -92,10 +94,10 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
 
   private createResizeHandle = (handle: IResizeHandle): ResizeHandleComponent => {
     const factory = this.factoryResolver.resolveComponentFactory(ResizeHandleComponent);
-    const component = factory.create(this.viewContainerRef.injector);
+    const component = this.viewContainerRef.createComponent(factory);
     component.instance.tabz = this;
     component.instance.handle = handle;
-    this.viewContainerRef.insert(component.hostView);
+    this.el.appendChild((component.hostView as any).rootNodes[0] as HTMLElement);
     return component.instance;
   }
 
