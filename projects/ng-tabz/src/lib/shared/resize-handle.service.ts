@@ -8,8 +8,11 @@ export class ResizeHandleService {
 
   constructor(private tabz: ITabzComponent) { }
 
+  private get margin(): number {
+    return (this.tabz.settings.margin || 0);
+  }
   private get collisionError(): number {
-    return (this.tabz.settings.margin || 0) + 4;
+    return this.margin + 4;
   }
 
   private checkCollision = (a: IPositionable, b: IPositionable, vertical: boolean): boolean => {
@@ -34,7 +37,9 @@ export class ResizeHandleService {
   }
 
   public createResizeHandle = (childrenBounds: IBounds[], vertical: boolean): IResizeHandle => {
-    const margin = this.tabz.settings.margin || 1;
+    const margin = (this.tabz.settings.margin || 0),
+      handleWidth = margin + 2;
+
     childrenBounds.sort((a, b) => {
       if (a.left <= b.left && a.top <= b.top) {
         return -1;
@@ -50,17 +55,17 @@ export class ResizeHandleService {
     return vertical ? {
       id: null,
       vertical: true,
-      top: first.top,
-      left: last.left + last.width,
-      height: last.top + last.height - first.top,
-      width: 2 + margin
+      top: first.top - margin - 1,
+      left: last.left + last.width - 1,
+      height: last.top + last.height - first.top + margin * 2 + 2,
+      width: handleWidth
     } : {
       id: null,
       vertical: false,
-      top: last.top + last.height,
-      left: first.left,
-      height: 2 + margin,
-      width: last.left + last.width - first.left
+      top: last.top + last.height - 1,
+      left: first.left - margin - 1,
+      height: handleWidth,
+      width: last.left + last.width - first.left + margin * 2 + 2
     };
   }
 
@@ -85,8 +90,8 @@ export class ResizeHandleService {
           (item.left < (result[1] ? result[1].left : Infinity) && item.left > initiator.left) ? item : result[1]
         ]), [null, null]);
 
-      const minLeft = (boundaryHandles[0] ? boundaryHandles[0].left : 0) + this.MIN_SIZE,
-        maxLeft = (boundaryHandles[1] ? boundaryHandles[1].left : tabzBounds.width) - this.MIN_SIZE;
+      const minLeft = (boundaryHandles[0] ? boundaryHandles[0].left : 0) + this.MIN_SIZE + this.margin,
+        maxLeft = (boundaryHandles[1] ? boundaryHandles[1].left : tabzBounds.width) - (this.MIN_SIZE + this.margin);
 
       let left = bounds.left;
       if (left < minLeft) {
@@ -126,8 +131,8 @@ export class ResizeHandleService {
           (item.top < (result[1] ? result[1].top : Infinity) && item.top > initiator.top) ? item : result[1]
         ]), [null, null]);
 
-      const minTop = (boundaryHandles[0] ? boundaryHandles[0].top : 0) + this.MIN_SIZE,
-        maxTop = (boundaryHandles[1] ? boundaryHandles[1].top : tabzBounds.height) - this.MIN_SIZE;
+      const minTop = (boundaryHandles[0] ? boundaryHandles[0].top : 0) + this.MIN_SIZE + this.margin,
+        maxTop = (boundaryHandles[1] ? boundaryHandles[1].top : tabzBounds.height) - (this.MIN_SIZE + this.margin);
 
       let top = bounds.top;
       if (top < minTop) {

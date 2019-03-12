@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ElementRef, Host, Renderer2 } from '@angular/core';
 import { ITabzGroup, ITabzGroupComponent } from '../models/tabz-group.model';
 import { NgTabzComponent } from '../ng-tabz.component';
-import { InteractService } from '../core/interact.service';
 
 @Component({
   selector: 'tabz-group',
@@ -22,8 +21,7 @@ export class NgTabzGroupComponent implements OnInit, ITabzGroupComponent {
   constructor(
     el: ElementRef<HTMLElement>,
     @Host() tabz: NgTabzComponent,
-    public renderer: Renderer2,
-    private interactService: InteractService
+    public renderer: Renderer2
   ) {
     this.el = el.nativeElement;
     this.tabz = tabz;
@@ -35,10 +33,8 @@ export class NgTabzGroupComponent implements OnInit, ITabzGroupComponent {
     this.left = boundsInPixels.left;
     this.height = boundsInPixels.height;
     this.width = boundsInPixels.width;
-    this.tabz.tabzRenderer.initItem(this.el, this.item, this.renderer);
     this.tabz.tabzRenderer.updateItem(this);
     this.tabz.addItem(this);
-    // this.interactService.initResize(this.el, this.tabz.onItemResize);
   }
 
 }
