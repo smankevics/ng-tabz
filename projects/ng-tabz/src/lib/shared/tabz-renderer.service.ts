@@ -17,10 +17,10 @@ export class TabzRenderer {
       parentHeight = this.tabz.el.clientHeight - this.margin;
 
     return {
-      left: Math.floor(parentWidth / 100 * item.left + this.margin),
-      top: Math.floor(parentHeight / 100 * item.top + this.margin),
-      width: Math.floor(parentWidth / 100 * item.width - this.margin),
-      height: Math.floor(parentHeight / 100 * item.height - this.margin)
+      left: Math.round(parentWidth / 100 * item.left + this.margin),
+      top: Math.round(parentHeight / 100 * item.top + this.margin),
+      width: Math.round(parentWidth / 100 * item.width - this.margin),
+      height: Math.round(parentHeight / 100 * item.height - this.margin)
     };
   }
 

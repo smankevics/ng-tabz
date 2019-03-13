@@ -22,5 +22,10 @@ export class HomeComponent {
     { id: '3.1', name: '3.1', left: 70, top: 0, height: 33, width: 30 },
     { id: '3.2', name: '3.2', left: 70, top: 33, height: 33, width: 30 },
     { id: '3.3', name: '3.3', left: 70, top: 66, height: 34, width: 30 }
+    // { id: '1.1', name: '1.1', left: 0, top: 0, height: 65, width: 60 },
+    // { id: '1.2', name: '1.2', left: 0, top: 65, height: 35, width: 60 },
+    // { id: '2.1', name: '2.1', left: 60, top: 0, height: 30, width: 40 },
+    // { id: '2.2', name: '2.2', left: 60, top: 30, height: 35, width: 40 },
+    // { id: '2.3', name: '2.3', left: 60, top: 65, height: 35, width: 40 }
   ];
 }
