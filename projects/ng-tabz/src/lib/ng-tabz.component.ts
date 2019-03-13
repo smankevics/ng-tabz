@@ -48,16 +48,11 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
 
   ngOnInit() {
     this.bounds = { left: 0, top: 0, height: this.el.clientHeight, width: this.el.clientWidth };
-    console.log(this.bounds);
     this.renderer.listen('window', 'resize', this.onWindowResize.bind(this));
   }
 
   ngAfterViewInit() {
     this.addGroupResizeHandles();
-
-    setTimeout(() => {
-      console.table(this.handles.map(item => ({left: item.left, top: item.top, height: item.height, width: item.width})));
-    });
   }
 
   private onWindowResize() {
@@ -66,9 +61,35 @@ export class NgTabzComponent implements ITabzComponent, OnInit, AfterViewInit {
   }
 
   public onItemResize(handle: IResizeHandleComponent, bounds: IBounds) {
-    console.log(bounds);
+    const prevLeft = handle.left,
+      prevTop = handle.top,
+      affectedItems = this.items.filter(item => this.resizeHandleService.checkCollision(handle, item, handle.handle.vertical));
+
     this.resizeHandleService.checkAndResizeHandles(this.handles, handle, bounds, this.bounds)
       .forEach(item => this.tabzRenderer.updateHandle(item));
+
+    const dx = handle.left - prevLeft,
+      dy = handle.top - prevTop;
+
+    affectedItems
+      .forEach(item => {
+        if (handle.handle.vertical) {
+          if (dx < 0 ? (item.left < handle.left) : (item.left + item.width < handle.left)) {
+            item.width += dx;
+          } else {
+            item.width -= dx;
+            item.left += dx;
+          }
+        } else {
+          if (dy < 0 ? (item.top < handle.top) : (item.top + item.height < handle.top)) {
+            item.height += dy;
+          } else {
+            item.height -= dy;
+            item.top += dy;
+          }
+        }
+        this.tabzRenderer.updateItem(item);
+      });
   }
 
   public addItem = (item: ITabzGroupComponent): void => {

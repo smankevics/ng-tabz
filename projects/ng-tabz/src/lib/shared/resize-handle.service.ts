@@ -15,7 +15,7 @@ export class ResizeHandleService {
     return this.margin + 4;
   }
 
-  private checkCollision = (a: IPositionable, b: IPositionable, vertical: boolean): boolean => {
+  public checkCollision = (a: IPositionable, b: IPositionable, vertical: boolean): boolean => {
     const error = vertical ? this.collisionError : -this.collisionError;
     if (a.left - error < b.left + b.width &&
       a.left + a.width + error > b.left &&

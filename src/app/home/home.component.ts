@@ -8,7 +8,7 @@ import { ITabz, ITabzGroup } from 'projects/ng-tabz/src/public_api';
 })
 export class HomeComponent {
   public settings: ITabz = {
-    margin: 2
+    margin: 4
   };
 
   public groups: ITabzGroup[] = [
